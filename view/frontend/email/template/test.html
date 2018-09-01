@@ -1,0 +1,20 @@
+<!--@subject {{trans "%subject" subject=$subject}} @-->
+{{template config_path="design/email/header_template"}}
+<table class="message-details">
+    <tr>
+        <td>
+            <b>{{trans "Name"}}</b>
+        </td>
+        <td>{{trans "%name" name=$name}}</td>
+    </tr>
+    <tr>
+        <td>
+            <b>{{trans "Email"}}</b>
+        </td>
+        <td>{{trans "%email" email=$email}}</td>
+    </tr>
+</table>
+<h4>{{trans "Message"}}</h4>
+<p>{{trans "%message" message=$message}}</p>
+<p>Thank you for understanding! Have a nice day.</p>
+{{template config_path="design/email/footer_template"}}
