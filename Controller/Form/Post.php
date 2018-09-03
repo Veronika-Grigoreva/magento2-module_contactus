@@ -55,7 +55,6 @@ class Post extends Action
         $this->transportBuilder = $transportBuilder;
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
-        $this->resultFactory = $resultFactory;
 
         parent::__construct($context);
     }
@@ -92,12 +91,20 @@ class Post extends Action
         }
 
         try {
+            $model     = $this->_objectManager->create('Test\Form\Model\Post');
             $data      = $this->getRequest()->getParams();
             $name      = $data['name'];
             $email     = $data['email'];
             $subject   = $data['subject'];
-            $messages  = $data['message'];
+            $message   = $data['message'];
             $adminData = $this->getAdminConfigValues();
+
+            $model->addData([
+                'name'    => $name,
+                'email'   => $email,
+                'subject' => $subject,
+                'message' => $message
+            ]);
 
             $transport = $this->transportBuilder->setTemplateIdentifier(
                 'email_template'
@@ -105,14 +112,18 @@ class Post extends Action
                     'area'  => 'frontend',
                     'store' => $store
                 ])->setTemplateVars([
-                    'message' => $messages,
+                    'message' => $message,
                     'name'    => $name,
                     'subject' => $subject,
                     'email'   => $email
                 ])->addTo($adminData['email'], $adminData['name'])->getTransport();
 
-            $transport->sendMessage();
-            $this->messageManager->addSuccessMessage('Email has been sent successfully');
+            $saveData = $model->save();
+
+            if ($saveData) {
+                $transport->sendMessage();
+                $this->messageManager->addSuccessMessage(__('Email has been sent successfully'));
+            }
         } catch (MailException $e) {
             $this->messageManager->addErrorMessage($e->getMessage());
         }
